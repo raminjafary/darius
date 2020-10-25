@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub(crate) struct Colors {
     pub cyan: Option<String>,
     pub red: Option<String>,
@@ -40,5 +40,42 @@ impl Default for Colors {
             blue: Some("\x1b[34;1m".into()),
             gray: Some("\x1b[90;1m".into()),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn colors_with_defaults() {
+        let default_colors: Colors = Colors::default();
+        let new_colors_with_the_same_as_default: Colors = Colors {
+            cyan: Some("\x1b[36;1m".into()),
+            red: Some("\x1b[31;1m".into()),
+            yellow: Some("\x1b[33;1m".into()),
+            green: Some("\x1b[32;1m".into()),
+            white: Some("\x1b[37;1m".into()),
+            magenta: Some("\x1b[35;1m".into()),
+            blue: Some("\x1b[34;1m".into()),
+            gray: Some("\x1b[90;1m".into()),
+        };
+
+        assert_eq!(default_colors, new_colors_with_the_same_as_default);
+    }
+    #[test]
+    fn overwrite_default_colors() {
+        let default_colors: Colors = Colors::default();
+        let new_colors: Colors = Colors {
+            cyan: Some("\x1b[36m".into()),
+            red: Some("\x1b[31m".into()),
+            yellow: Some("\x1b[33m".into()),
+            green: Some("\x1b[32m".into()),
+            white: Some("\x1b[37m".into()),
+            magenta: Some("\x1b[35m".into()),
+            blue: Some("\x1b[34m".into()),
+            gray: Some("\x1b[90m".into()),
+        };
+
+        assert_ne!(default_colors, new_colors);
     }
 }
