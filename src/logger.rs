@@ -18,11 +18,11 @@ fn define_log_level<S: AsRef<str>>(text: S, level: LogLevels) -> () {
         LogLevels::Verbose => colors.magenta.unwrap(),
     };
 
-    println!(
-        "{color} {}\x1b[0m",
-        text.as_ref(),
-        color = matched_color_with_log_level
-    );
+    print_with_color(text, matched_color_with_log_level)
+}
+
+fn print_with_color<S: AsRef<str>>(text: S, color: String) {
+    println!("{color} {}\x1b[0m", text.as_ref(), color = color);
 }
 
 pub fn fatal<S: AsRef<str>>(text: S) {
@@ -59,4 +59,42 @@ pub fn trace<S: AsRef<str>>(text: S) {
 
 pub fn verbose<S: AsRef<str>>(text: S) {
     define_log_level(text, LogLevels::Verbose)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const TEXT: &str = "Sample text!";
+
+    #[test]
+    fn all_log_levels() {
+        assert_eq!(fatal(TEXT), ());
+        assert_eq!(error(TEXT), ());
+        assert_eq!(warn(TEXT), ());
+        assert_eq!(info(TEXT), ());
+        assert_eq!(success(TEXT), ());
+        assert_eq!(log(TEXT), ());
+        assert_eq!(debug(TEXT), ());
+        assert_eq!(trace(TEXT), ());
+        assert_eq!(verbose(TEXT), ());
+    }
+
+    #[test]
+    fn color_print_with_custom_fg() {
+        let magenta_fg = "\x1b[35;1m".into();
+        assert_eq!(print_with_color(TEXT, magenta_fg), ());
+    }
+
+    #[test]
+    fn color_print_with_custom_bg() {
+        let blue_bg = "\x1b[44m".into();
+        assert_eq!(print_with_color(TEXT, blue_bg), ());
+    }
+
+    #[test]
+    fn color_print_with_custom_bg_and_fg() {
+        let red_fg_with_white_bg = "\x1b[48;5;93;41m\x1b[7m".into();
+        assert_eq!(print_with_color(TEXT, red_fg_with_white_bg), ());
+    }
 }
