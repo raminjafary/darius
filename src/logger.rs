@@ -2,6 +2,7 @@ mod colors;
 mod log_levels;
 use colors::Colors;
 use log_levels::LogLevels;
+use std::io::{self, Write};
 
 fn define_log_level<S: AsRef<str>>(text: S, level: LogLevels) -> () {
     let colors: Colors = Colors::default();
@@ -18,11 +19,12 @@ fn define_log_level<S: AsRef<str>>(text: S, level: LogLevels) -> () {
         LogLevels::Verbose => colors.magenta.unwrap(),
     };
 
-    print_with_color(text, matched_color_with_log_level)
+    print_with_color::<S>(text, matched_color_with_log_level);
 }
 
 fn print_with_color<S: AsRef<str>>(text: S, color: String) {
-    println!("{color} {}\x1b[0m", text.as_ref(), color = color);
+    let mut handle: io::BufWriter<io::Stdout> = io::BufWriter::new(io::stdout());
+    writeln!(handle, "{color} {}\x1b[0m", text.as_ref(), color = color).unwrap();
 }
 
 pub fn fatal<S: AsRef<str>>(text: S) {
